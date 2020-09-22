@@ -1,0 +1,3 @@
+2020-09-22 16:18:46,257 -ERROR - library.orm_queries.queries- queries.py - test - Book Not Found in Any Borrowed Transaction
+2020-09-22 16:18:46,265 -ERROR - library.orm_queries.queries- queries.py - test - Book item not Available
+2020-09-22 16:18:46,373 -ERROR - library.orm_queries.queries- queries.py - test - Book item not Available
