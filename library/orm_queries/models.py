@@ -39,6 +39,9 @@ __author__ = 'praveen@gyandata.com'
 Base = declarative_base()
 
 
+# pylint: disable=too-few-public-methods
+
+
 class MyEnum(enum.Enum):
     """ Enum class to store the status of book items"""
     AVAILABLE = "AVAILABLE"
@@ -456,7 +459,7 @@ class ProfessorBorrow(Base):
     book_bar_code_id = Column(Integer, ForeignKey("book_item.bar_code"),
                               primary_key=True)
     # Due Date
-    dd = Column(DATE(), nullable=False,default=date.today() + timedelta(15))
+    dd = Column(DATE(), nullable=False, default=date.today() + timedelta(15))
     # Return Date
     rd = Column(DATE())
 

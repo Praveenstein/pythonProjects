@@ -30,6 +30,8 @@ from library.orm_queries.models import Staffs, Department, \
 
 __author__ = 'praveen@gyandata.com'
 
+# pylint: disable=too-few-public-methods
+
 
 def populate(session):
     """
