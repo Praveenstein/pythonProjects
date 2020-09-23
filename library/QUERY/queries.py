@@ -38,7 +38,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # User Import
-from library.orm_queries.models import Staffs, Department, \
+from library.ORM.models import Staffs, Department, \
     Students, Professors, Books, BookItem, MyEnum, StudentActivity, \
     ProfessorActivity, StudentBorrow, ProfessorBorrow, Base
 
@@ -52,7 +52,8 @@ def log():
     """
     Creates a custom logger from the configuration dictionary
     """
-    with open('/configs/analyse_log.json', 'r') as file:
+    with open('D:\\Profession\\Intern\\Assignments\\master_repo\\'
+              'pythonProjects\\configs\\analyse_log.json', 'r') as file:
         config = json.load(file)
         logging.config.dictConfig(config)
     global logger
