@@ -10,16 +10,15 @@ environment you are running this script in.
 # External import
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
 
 
 # User Import
+from library.orm_queries.models import Base
 from library.orm_queries.populate import populate
 from library.orm_queries.queries import log, test
 
 
 __author__ = 'praveen@gyandata.com'
-Base = declarative_base()
 
 
 def main():
