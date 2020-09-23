@@ -24,13 +24,15 @@ environment you are running this script in.
 
 """
 
+# Standard Imports
+from datetime import date, timedelta, datetime
+import enum
 
+# External Imports
 from sqlalchemy import Column, Integer, DateTime, Enum, \
     String, Float, DATE, Boolean, ForeignKey, CheckConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
-from datetime import date, timedelta, datetime
-import enum
 
 __author__ = 'praveen@gyandata.com'
 
@@ -38,6 +40,7 @@ Base = declarative_base()
 
 
 class MyEnum(enum.Enum):
+    """ Enum class to store the status of book items"""
     AVAILABLE = "AVAILABLE"
     UNAVAILABLE = "UNAVAILABLE"
     LOST = "LOST"
@@ -75,7 +78,8 @@ class Department(Base):
 
     students = relationship("Students", backref=backref('department'), order_by="Students.reg_id",
                             cascade="all, delete, delete-orphan")
-    staffs = relationship("Professors", backref=backref('department'), order_by="Professors.employee_code",
+    staffs = relationship("Professors", backref=backref('department'),
+                          order_by="Professors.employee_code",
                           cascade="all, delete, delete-orphan")
     books = relationship("Books", backref=backref('department'), order_by="Books.isbn_id",
                          cascade="all, delete, delete-orphan")
@@ -96,7 +100,8 @@ class Students(Base):
         Date of joining of student
 
     dept_id : int
-        Foreign key referring to Department Table, denoting the department to which the student belongs to
+        Foreign key referring to Department Table, denoting the department
+        to which the student belongs to
 
     activities : list
         List of activities belonging to this student.
@@ -111,7 +116,8 @@ class Students(Base):
     created_on = Column(DateTime, default=datetime.now())
     update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
 
-    activities = relationship("StudentActivity", backref=backref('student'), order_by="StudentActivity.trans_id",
+    activities = relationship("StudentActivity", backref=backref('student'),
+                              order_by="StudentActivity.trans_id",
                               cascade="all, delete, delete-orphan")
 
 
@@ -127,7 +133,8 @@ class Professors(Base):
         Name of professor.
 
     dept_id : int
-        Foreign key referring to Department Table, denoting the department to which the professor belongs to
+        Foreign key referring to Department Table, denoting the department
+        to which the professor belongs to
 
     activities : list
         List of activities belonging to this professor.
@@ -141,7 +148,8 @@ class Professors(Base):
     created_on = Column(DateTime, default=datetime.now())
     update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
 
-    activities = relationship("ProfessorActivity", backref=backref('professor'), order_by="ProfessorActivity.trans_id",
+    activities = relationship("ProfessorActivity", backref=backref('professor'),
+                              order_by="ProfessorActivity.trans_id",
                               cascade="all, delete, delete-orphan")
 
 
@@ -180,7 +188,8 @@ class Books(Base):
         Number of copies of books available.
 
     dept_id : str
-        Foreign key referring to Department Table, denoting the department to which the book belongs to
+        Foreign key referring to Department Table, denoting the department
+        to which the book belongs to
 
     book_items : list
         List of book_items belonging to this book.
@@ -195,13 +204,15 @@ class Books(Base):
     created_on = Column(DateTime, default=datetime.now())
     update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
 
-    book_items = relationship("BookItem", backref=backref('book'), order_by="BookItem.bar_code",
+    book_items = relationship("BookItem", backref=backref('book'),
+                              order_by="BookItem.bar_code",
                               cascade="all, delete, delete-orphan")
 
 
 class BooksAuthor(Base):
-    """This class stores the information pertaining to the BookAuthors- An Association table to reflect the many
-    to many relationship between books and authors.
+    """This class stores the information pertaining to the BookAuthors-
+    An Association table to reflect the many to many relationship between
+    books and authors.
 
     Attributes
     ----------
@@ -257,9 +268,11 @@ class Staffs(Base):
     update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
 
     student_activities = relationship("StudentActivity", backref=backref('staff'),
-                                      order_by="StudentActivity.trans_id", cascade="all, delete, delete-orphan")
+                                      order_by="StudentActivity.trans_id",
+                                      cascade="all, delete, delete-orphan")
     professor_activities = relationship("ProfessorActivity", backref=backref('staff'),
-                                        order_by="ProfessorActivity.trans_id", cascade="all, delete, delete-orphan")
+                                        order_by="ProfessorActivity.trans_id",
+                                        cascade="all, delete, delete-orphan")
 
 
 class BookItem(Base):
@@ -368,7 +381,8 @@ class ProfessorActivity(Base):
 
     update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
 
-    book_items = relationship("BookItem", backref="professor_activities", secondary="professor_borrow")
+    book_items = relationship("BookItem", backref="professor_activities",
+                              secondary="professor_borrow")
 
 
 class StudentBorrow(Base):
@@ -403,8 +417,9 @@ class StudentBorrow(Base):
 
     update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
 
-    student_activity = relationship("StudentActivity", backref=backref("book_item_associations",
-                                                                       cascade="all, delete, delete-orphan"))
+    student_activity = relationship("StudentActivity",
+                                    backref=backref("book_item_associations",
+                                                    cascade="all, delete, delete-orphan"))
     book_item = relationship("BookItem", backref=backref("student_activity_associations",
                                                          cascade="all, delete, delete-orphan"))
 
@@ -416,7 +431,8 @@ class ProfessorBorrow(Base):
     Attributes
     ----------
     professor_trans_id : int
-        Primary Key of ProfessorBorrow table, also a foreign key denoting the professor's transaction.
+        Primary Key of ProfessorBorrow table, also a foreign key
+        denoting the professor's transaction.
 
     book_bar_code_id : int
         Primary Key of StudentBorrow table, also a foreign key denoting the book_item.
@@ -435,8 +451,10 @@ class ProfessorBorrow(Base):
     """
 
     __tablename__ = 'professor_borrow'
-    professor_trans_id = Column(Integer, ForeignKey("professor_activity.trans_id"), primary_key=True)
-    book_bar_code_id = Column(Integer, ForeignKey("book_item.bar_code"), primary_key=True)
+    professor_trans_id = Column(Integer, ForeignKey("professor_activity.trans_id"),
+                                primary_key=True)
+    book_bar_code_id = Column(Integer, ForeignKey("book_item.bar_code"),
+                              primary_key=True)
     # Due Date
     dd = Column(DATE(), nullable=False,default=date.today() + timedelta(15))
     # Return Date
@@ -444,7 +462,8 @@ class ProfessorBorrow(Base):
 
     update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
 
-    professor_activity = relationship("ProfessorActivity", backref=backref("book_item_associations",
-                                                                           cascade="all, delete, delete-orphan"))
+    professor_activity = relationship("ProfessorActivity",
+                                      backref=backref("book_item_associations",
+                                                      cascade="all, delete, delete-orphan"))
     book_item = relationship("BookItem", backref=backref("professor_activity_associations",
                                                          cascade="all, delete, delete-orphan"))
