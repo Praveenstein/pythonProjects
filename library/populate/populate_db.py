@@ -23,7 +23,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # User Import
-from library.ORM.models import Staffs, Department, \
+from library.orm.models import Staffs, Department, \
     Students, Professors, Books, BookItem,\
     Base, Authors, BooksAuthor
 

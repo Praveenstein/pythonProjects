@@ -1,9 +1,0 @@
-2020-09-23 16:17:43,421 -ERROR - __main__- queries.py - test - Book Not Found in Any Borrowed Transaction
-2020-09-23 16:17:43,424 -ERROR - __main__- queries.py - test - Book item not Available
-2020-09-23 16:17:43,484 -ERROR - __main__- queries.py - test - Book item not Available
-2020-09-23 16:24:44,056 -ERROR - library.orm_queries.queries- queries.py - test - Book Not Found in Any Borrowed Transaction
-2020-09-23 16:24:44,061 -ERROR - library.orm_queries.queries- queries.py - test - Book item not Available
-2020-09-23 16:24:44,129 -ERROR - library.orm_queries.queries- queries.py - test - Book item not Available
-2020-09-23 16:45:33,350 -ERROR - library.QUERY.queries- queries.py - test - Book Not Found in Any Borrowed Transaction
-2020-09-23 16:45:33,354 -ERROR - library.QUERY.queries- queries.py - test - Book item not Available
-2020-09-23 16:45:33,408 -ERROR - library.QUERY.queries- queries.py - test - Book item not Available

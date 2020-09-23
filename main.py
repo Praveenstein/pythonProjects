@@ -13,9 +13,9 @@ from sqlalchemy.orm import sessionmaker
 
 
 # User Import
-from library.ORM.models import Base
-from library.POPULATE.populate import populate
-from library.QUERY.queries import log, test
+from library.orm.models import Base
+from library.populate.populate_db import populate
+from library.query.queries import log, test
 
 
 __author__ = 'praveen@gyandata.com'
