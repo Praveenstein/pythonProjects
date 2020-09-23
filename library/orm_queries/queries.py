@@ -36,16 +36,14 @@ import logging.config
 # External import
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
 
 # User Import
 from library.orm_queries.models import Staffs, Department, \
     Students, Professors, Books, BookItem, MyEnum, StudentActivity, \
-    ProfessorActivity, StudentBorrow, ProfessorBorrow
+    ProfessorActivity, StudentBorrow, ProfessorBorrow, Base
 
 
 __author__ = 'praveen@gyandata.com'
-Base = declarative_base()
 
 
 def log():
