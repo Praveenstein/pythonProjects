@@ -25,12 +25,10 @@ from sqlalchemy.orm import sessionmaker
 # User Import
 from library.orm.models import Staffs, Department, \
     Students, Professors, Books, BookItem,\
-    Base, Authors, BooksAuthor
+    Base, Authors
 
 
 __author__ = 'praveen@gyandata.com'
-
-# pylint: disable=too-few-public-methods
 
 
 def populate(session):
@@ -63,8 +61,11 @@ def populate(session):
 
     # Adding Students, professors, books, authors and book-items for all departments
     for department in departments:
+
+        # For every department, books, students and professors are created
         for i in range(10):
 
+            # Creating 10 students per department
             student = Students(name="student" + str(department.name) + str(i),
                                doj=date.today() - timedelta(random.randint(30, 600)),
                                department=department)
@@ -73,6 +74,7 @@ def populate(session):
 
         for i in range(3):
 
+            # Creating 3 professor per department
             professor = Professors(name="professor" + str(department.name) + str(i),
                                    department=department)
             session.add(professor)
@@ -80,12 +82,10 @@ def populate(session):
 
         for i in range(10):
 
-            # pylint: disable=no-member
-
+            # Creating 10 books and one author for every book
             book = Books(name="book" + str(department.name) + str(i), quantity=2,
                          department=department)
             author = Authors(name="Author" + str(department.name) + str(i))
-            book_author = BooksAuthor()
             book_1 = BookItem(dopur=date.today() - timedelta(random.randint(30, 600)),
                               dopub=date.today() - timedelta(random.randint(30, 600)),
                               price=round((random.random() * 10000), 2),
@@ -94,32 +94,31 @@ def populate(session):
                               dopub=date.today() - timedelta(random.randint(30, 600)),
                               price=round((random.random() * 10000), 2),
                               edition=2.0, book=book)
-            session.add_all([book, author, book_author, book_1, book_2])
-            book_author.book = book
-            author.books.append(book_author)
+            session.add_all([book, author, book_1, book_2])
+            author.books.append(book)
             session.commit()
+
+    # Closing the session
+    session.close()
 
 
 def main():
     """ The main function to initialize engines and call necessary functions"""
 
-    # pylint: disable=no-member
-    # pylint: disable=invalid-name
-
     url = "mysql+pymysql://root:nebula@localhost/library1?charset=utf8mb4"
     engine = create_engine(url)
 
+    # Creating all tables in the database
     Base.metadata.create_all(engine)
 
+    # Creating a session factory
     Session = sessionmaker(bind=engine)
 
+    # Creating a new session to populate the database
     pop_session = Session()
 
+    # calling populate function to populate the database
     populate(pop_session)
-
-    populate(pop_session)
-
-    pop_session.close()
 
 
 if __name__ == '__main__':
