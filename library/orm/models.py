@@ -39,9 +39,6 @@ __author__ = 'praveen@gyandata.com'
 Base = declarative_base()
 
 
-# pylint: disable=too-few-public-methods
-
-
 class MyEnum(enum.Enum):
     """ Enum class to store the status of book items"""
     AVAILABLE = "AVAILABLE"
@@ -175,6 +172,8 @@ class Authors(Base):
     created_on = Column(DateTime, default=datetime.now())
     update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
 
+    books = relationship("Books", backref="authors", secondary="book_has_authors")
+
 
 class Books(Base):
     """This class stores the information pertaining to the books.
@@ -239,9 +238,9 @@ class BooksAuthor(Base):
     created_on = Column(DateTime, default=datetime.now())
     update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
 
-    book = relationship("Books", backref=backref("authors",
+    book = relationship("Books", backref=backref("author_associations",
                                                  cascade="all, delete, delete-orphan"))
-    author = relationship("Authors", backref=backref("books",
+    author = relationship("Authors", backref=backref("books_associations",
                                                      cascade="all, delete, delete-orphan"))
 
 
@@ -415,8 +414,8 @@ class StudentBorrow(Base):
     __tablename__ = 'student_borrow'
     student_trans_id = Column(Integer, ForeignKey("student_activity.trans_id"), primary_key=True)
     book_bar_code_id = Column(Integer, ForeignKey("book_item.bar_code"), primary_key=True)
-    dd = Column(DATE(), nullable=False, default=date.today() + timedelta(15))
-    rd = Column(DATE())
+    due_date = Column(DATE(), nullable=False, default=date.today() + timedelta(15))
+    return_date = Column(DATE())
 
     update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
 
@@ -459,9 +458,9 @@ class ProfessorBorrow(Base):
     book_bar_code_id = Column(Integer, ForeignKey("book_item.bar_code"),
                               primary_key=True)
     # Due Date
-    dd = Column(DATE(), nullable=False, default=date.today() + timedelta(15))
+    due_date = Column(DATE(), nullable=False, default=date.today() + timedelta(15))
     # Return Date
-    rd = Column(DATE())
+    return_date = Column(DATE())
 
     update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
 
