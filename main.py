@@ -15,7 +15,7 @@ from sqlalchemy.orm import sessionmaker
 # User Import
 from library.orm.models import Base
 from library.populate.populate_db import populate
-from library.query.queries import log, test
+from library.query.queries import basic_trans, impact_analysis, test_tamper
 
 
 __author__ = 'praveen@gyandata.com'
@@ -37,20 +37,21 @@ def main():
     # creating a session factory
     Session = sessionmaker(bind=engine)
 
-    # Creating a session to populate the database
-    pop_session = Session()
+    # Populating the database, # Giving a new session as parameter
+    populate(Session())
 
-    # Populating the database
-    populate(pop_session)
+    # Calling the basic transaction to do some issues, passing the
+    # Session factory as parameter
+    basic_trans(Session)
 
-    # Closing the session
-    pop_session.close()
+    # Doing some student transactions and displaying the impact and other details,
+    # And passing the Session factory as parameter
+    test_tamper(Session)
 
-    # Creating logger
-    log()
-
-    # Doing some student transactions and displaying the impact and other details
-    test(Session)
+    # Calling impact analysis to issue to books and check the impact
+    # On Computer science department
+    # And passing the session factory as parameter
+    impact_analysis(Session)
 
     # Deleting all tables
     Base.metadata.drop_all(engine)
