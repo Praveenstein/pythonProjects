@@ -30,7 +30,6 @@ environment you are running this script in.
 # Standard import
 from datetime import date
 import json
-import logging
 import logging.config
 from contextlib import contextmanager
 
@@ -41,8 +40,19 @@ from library.orm.models import Staffs, Department, \
 from library.connections.get_connection import Session, config_session, engine
 
 
+__author__ = 'praveen@gyandata.com'
+
+with open('D:\\Profession\\Intern\\Assignments\\master_repo\\'
+          'pythonProjects\\configs\\analyse_log.json', 'r') as file:
+    config = json.load(file)
+
+logging.config.dictConfig(config)
+
+QUERY_LOGGER = logging.getLogger(__name__)
+
+
 @contextmanager
-def session_scope():
+def query_session_scope():
     """Provide a transactional scope around a series of operations."""
     session = Session()
     try:
@@ -55,19 +65,6 @@ def session_scope():
         QUERY_LOGGER.error(err)
     finally:
         session.close()
-
-
-__author__ = 'praveen@gyandata.com'
-
-QUERY_LOGGER = logging.getLogger(__name__)
-
-
-def config_log_query():
-    with open('D:\\Profession\\Intern\\Assignments\\master_repo\\'
-              'pythonProjects\\configs\\analyse_log.json', 'r') as file:
-        config = json.load(file)
-
-    logging.config.dictConfig(config)
 
 
 def student_issue(staff, s_id, b_id):
@@ -87,7 +84,7 @@ def student_issue(staff, s_id, b_id):
 
     print("\nIssuing\n")
 
-    with session_scope() as session:
+    with query_session_scope() as session:
         # Asserting the parameters
         assert isinstance(staff, int), "Staff ID should be integer"
         assert isinstance(s_id, int), "Student ID should be integer"
@@ -156,7 +153,7 @@ def professor_issue(staff, p_id, b_id):
 
     print("\nIssuing\n")
 
-    with session_scope() as session:
+    with query_session_scope() as session:
         # Asserting the parameters
         assert isinstance(staff, int), "Staff ID should be integer"
         assert isinstance(p_id, int), "Professor ID should be integer"
@@ -225,7 +222,7 @@ def student_returning(b_id, lost=False, tampered=False):
     """
     print("\nReturning\n")
 
-    with session_scope() as session:
+    with query_session_scope() as session:
         # Asserting the parameters
         assert isinstance(b_id, list), "Books should be a list"
         assert isinstance(lost, bool), "Lost has to be boolean"
@@ -288,7 +285,7 @@ def professor_returning(b_id, lost=False, tampered=False):
     """
     print("\nReturning\n")
 
-    with session_scope() as session:
+    with query_session_scope() as session:
         # Asserting the parameters
         assert isinstance(b_id, list), "Books should be a list"
         assert isinstance(lost, bool), "Lost has to be boolean"
@@ -342,7 +339,7 @@ def impact(dep):
         Department Id
 
     """
-    with session_scope() as session:
+    with query_session_scope() as session:
         # Asserting parameters
         assert isinstance(dep, int), "Department Id should be integer"
 
@@ -386,7 +383,7 @@ def check_status(book_id):
     """
     print("\nChecking\n")
 
-    with session_scope() as session:
+    with query_session_scope() as session:
         # Asserting the parameters
         assert isinstance(book_id, int), "Book Id should be integer"
 
@@ -533,7 +530,7 @@ def main():
     """
 
     # Configuring the query log
-    config_log_query()
+    #config_log_query()
 
     # Configuring the session factory
     config_session()

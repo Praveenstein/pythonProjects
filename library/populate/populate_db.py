@@ -31,19 +31,18 @@ from library.connections.get_connection import Session, config_session, engine
 
 __author__ = 'praveen@gyandata.com'
 
+
+with open('D:\\Profession\\Intern\\Assignments\\master_repo\\'
+          'pythonProjects\\configs\\pop_log.json', 'r') as file:
+    config = json.load(file)
+
+logging.config.dictConfig(config)
+
 POP_LOGGER = logging.getLogger(__name__)
 
 
-def config_log_pop():
-    with open('D:\\Profession\\Intern\\Assignments\\master_repo\\'
-              'pythonProjects\\configs\\pop_log.json', 'r') as file:
-        config = json.load(file)
-
-    logging.config.dictConfig(config)
-
-
 @contextmanager
-def session_scope():
+def population_session_scope():
     """Provide a transactional scope around a series of operations."""
     session = Session()
     try:
@@ -62,7 +61,7 @@ def populate():
     """
     Function to populate the database
     """
-    with session_scope() as session:
+    with population_session_scope() as session:
         # Adding Staffs
         staff1 = Staffs(name="Staff-1")
         staff2 = Staffs(name="Staff-2")
@@ -128,7 +127,7 @@ def main():
     Base.metadata.create_all(engine)
 
     # Configure the logger
-    config_log_pop()
+    #config_log_pop()
 
     # Configure the session
     config_session()
