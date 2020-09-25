@@ -15,7 +15,8 @@ from sqlalchemy.orm import sessionmaker
 # User Import
 from library.orm.models import Base
 from library.populate.populate_db import populate
-from library.query.queries import basic_trans, impact_analysis, test_tamper
+from library.query.queries import basic_trans, impact_analysis,\
+    test_tamper, config_log_query
 
 
 __author__ = 'praveen@gyandata.com'
@@ -23,9 +24,6 @@ __author__ = 'praveen@gyandata.com'
 
 def main():
     """Main Function to populate the database and perform queries"""
-
-    # pylint: disable=no-member
-    # pylint: disable=invalid-name
 
     # Creating engine to connect to Mysql database
     url = "mysql+pymysql://root:nebula@localhost/library1?charset=utf8mb4"
@@ -39,6 +37,9 @@ def main():
 
     # Populating the database, # Giving a new session as parameter
     populate(Session())
+
+    # Configuring the query log
+    config_log_query()
 
     # Calling the basic transaction to do some issues, passing the
     # Session factory as parameter
@@ -54,7 +55,7 @@ def main():
     impact_analysis(Session)
 
     # Deleting all tables
-    Base.metadata.drop_all(engine)
+    #Base.metadata.drop_all(engine)
 
 
 if __name__ == '__main__':

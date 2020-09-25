@@ -32,15 +32,29 @@ from datetime import date
 import json
 import logging
 import logging.config
-
-# External import
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from contextlib import contextmanager
 
 # User Import
 from library.orm.models import Staffs, Department, \
     Students, Professors, Books, BookItem, MyEnum, StudentActivity, \
     ProfessorActivity, StudentBorrow, ProfessorBorrow, Base
+from library.connections.get_connection import Session, config_session, engine
+
+
+@contextmanager
+def session_scope():
+    """Provide a transactional scope around a series of operations."""
+    session = Session()
+    try:
+        yield session
+        session.commit()
+    except AssertionError as err:
+        QUERY_LOGGER.error(err)
+    except AttributeError as err:
+        session.rollback()
+        QUERY_LOGGER.error(err)
+    finally:
+        session.close()
 
 
 __author__ = 'praveen@gyandata.com'
@@ -56,13 +70,12 @@ def config_log_query():
     logging.config.dictConfig(config)
 
 
-def student_issue(session, staff, s_id, b_id):
+def student_issue(staff, s_id, b_id):
     """
     Function to issues books to student
 
     Parameters
     ----------
-    session: Session
 
     staff : int
         Staff id who handled the issue.
@@ -74,7 +87,7 @@ def student_issue(session, staff, s_id, b_id):
 
     print("\nIssuing\n")
 
-    try:
+    with session_scope() as session:
         # Asserting the parameters
         assert isinstance(staff, int), "Staff ID should be integer"
         assert isinstance(s_id, int), "Student ID should be integer"
@@ -125,24 +138,14 @@ def student_issue(session, staff, s_id, b_id):
         print(f"Date Of Issue: {student_activity.doi}\n")
         for book_item in book_list:
             print("Name of book: ", book_item.book.name)
-        session.commit()
-    except AssertionError as err:
-        QUERY_LOGGER.error(err)
-    except AttributeError as err:
-        session.rollback()
-        QUERY_LOGGER.error(err)
-    finally:
-        session.close()
 
 
-def professor_issue(session, staff, p_id, b_id):
+def professor_issue(staff, p_id, b_id):
     """
     Function to issues books to professor
 
     Parameters
     ----------
-    session: Session
-
     staff : int
         Staff id who handled the issue.
     p_id : int
@@ -153,7 +156,7 @@ def professor_issue(session, staff, p_id, b_id):
 
     print("\nIssuing\n")
 
-    try:
+    with session_scope() as session:
         # Asserting the parameters
         assert isinstance(staff, int), "Staff ID should be integer"
         assert isinstance(p_id, int), "Professor ID should be integer"
@@ -203,23 +206,14 @@ def professor_issue(session, staff, p_id, b_id):
         print(f"Date Of Issue: {professor_activity.doi}\n")
         for book_item in book_list:
             print("Name of book: ", book_item.book.name)
-        session.commit()
-    except AssertionError as err:
-        QUERY_LOGGER.error(err)
-    except AttributeError as err:
-        session.rollback()
-        QUERY_LOGGER.error(err)
-    finally:
-        session.close()
 
 
-def student_returning(session, b_id, lost=False, tampered=False):
+def student_returning(b_id, lost=False, tampered=False):
     """
     Function to return books from student.
 
     Parameters
     ----------
-    session: Session
 
     b_id : list
         list of book-item bar codes being returned.
@@ -231,7 +225,7 @@ def student_returning(session, b_id, lost=False, tampered=False):
     """
     print("\nReturning\n")
 
-    try:
+    with session_scope() as session:
         # Asserting the parameters
         assert isinstance(b_id, list), "Books should be a list"
         assert isinstance(lost, bool), "Lost has to be boolean"
@@ -275,23 +269,14 @@ def student_returning(session, b_id, lost=False, tampered=False):
             session.flush()
 
             print("Books are returned")
-        session.commit()
-    except AssertionError as err:
-        QUERY_LOGGER.error(err)
-    except AttributeError as err:
-        session.rollback()
-        QUERY_LOGGER.error(err)
-    finally:
-        session.close()
 
 
-def professor_returning(session, b_id, lost=False, tampered=False):
+def professor_returning(b_id, lost=False, tampered=False):
     """
     Function to return books from professor.
 
     Parameters
     ----------
-    session: Session
 
     b_id : list
         list of book-item bar codes being returned.
@@ -303,7 +288,7 @@ def professor_returning(session, b_id, lost=False, tampered=False):
     """
     print("\nReturning\n")
 
-    try:
+    with session_scope() as session:
         # Asserting the parameters
         assert isinstance(b_id, list), "Books should be a list"
         assert isinstance(lost, bool), "Lost has to be boolean"
@@ -345,28 +330,19 @@ def professor_returning(session, b_id, lost=False, tampered=False):
             professor_borrow.return_date = date.today()
             session.flush()
             print("Books are returned")
-        session.commit()
-    except AssertionError as err:
-        QUERY_LOGGER.error(err)
-    except AttributeError as err:
-        session.rollback()
-        QUERY_LOGGER.error(err)
-    finally:
-        session.close()
 
 
-def impact(session, dep):
+def impact( dep):
     """
     Function to check the impact on a department.
 
     Parameters
     ----------
-    session: Session
     dep : int
         Department Id
 
     """
-    try:
+    with session_scope() as session:
         # Asserting parameters
         assert isinstance(dep, int), "Department Id should be integer"
 
@@ -399,30 +375,21 @@ def impact(session, dep):
         for i in data:
             print(f"Transaction Id: {i[0]}, Student name: {i[1]},"
                   f" student department: {i[2]}")
-        session.commit()
-    except AssertionError as err:
-        QUERY_LOGGER.error(err)
-    except AttributeError as err:
-        session.rollback()
-        QUERY_LOGGER.error(err)
-    finally:
-        session.close()
 
 
-def check_status(session, book_id):
+def check_status(book_id):
     """
     Function to check the status of a given book
 
     Parameters
     ----------
-    session: Session
 
     book_id : int
         Primary Key/ Isbn code of Book.
     """
     print("\nChecking\n")
 
-    try:
+    with session_scope() as session:
         # Asserting the parameters
         assert isinstance(book_id, int), "Book Id should be integer"
 
@@ -463,24 +430,11 @@ def check_status(session, book_id):
             else:
                 print(f"\nBook Name: {book_object.name} - Bard Code: {item.bar_code}"
                       f" is {item.status.name}\n")
-        session.commit()
-    except AssertionError as err:
-        QUERY_LOGGER.error(err)
-    except AttributeError as err:
-        session.rollback()
-        QUERY_LOGGER.error(err)
-    finally:
-        session.close()
 
 
-def basic_trans(session_factory):
+def basic_trans():
     """
     Function to perform some basic book issue to students and showing how errors occur
-
-    Parameters
-    ----------
-    session_factory: Session
-            The session maker factory used to create new session for every request
 
     Returns
     -------
@@ -488,39 +442,27 @@ def basic_trans(session_factory):
     """
 
     # Issuing book (id-[1]) to student (id-1) by staff (id-1)
-    student_issue(session_factory(), 1, 1, [1])
+    student_issue(1, 1, [1])
 
-    student_issue(session_factory(), 1, 2, [3, 5])
+    student_issue(1, 2, [3, 5])
 
-    student_issue(session_factory(), 1, 2, [2])
-
-    # Checking the status of book-item of bar_code = 2,
-    # Which will be unavailable since it was issued previously
-    session = session_factory()
-    book = session.query(BookItem).filter_by(bar_code=2).first()
-    print(book.status)
-    session.close()
+    student_issue(1, 2, [2])
 
     # Student Returning [Session, Book_item bar code[2]]
-    student_returning(session_factory(), [2])
+    student_returning([2])
 
     # Student trying to return a book, which was never borrowed,
     # Hence will raise an error, saying it was not found in an borrows
-    student_returning(session_factory(), [6])
+    student_returning([6])
 
     # Trying to issue book to student of book-item bar code = 1,
     # Since that was previously issued, it raises an error that it is unavailable
-    student_issue(session_factory(), 1, 3, [1])
+    student_issue(1, 3, [1])
 
 
-def test_tamper(session_factory):
+def test_tamper():
     """
     Function to show how security is enforced using tampered parameter
-
-    Parameters
-    ----------
-    session_factory: Session
-            The session maker factory used to create new session for every request
 
     Returns
     -------
@@ -530,42 +472,37 @@ def test_tamper(session_factory):
     print("\nTesting Tampering----------------\n")
 
     # Issuing book to student
-    student_issue(session_factory(), 1, 3, [22])
+    student_issue(1, 3, [22])
 
     # Student returns the book tampered
     # Hence he will be asked to pay fine,
     # And the tampered attribute will be set to True
-    student_returning(session_factory(), [22], tampered=True)
+    student_returning([22], tampered=True)
 
     # Issuing the same book [bar_code = 22] to student
-    student_issue(session_factory(), 1, 3, [22])
+    student_issue(1, 3, [22])
 
     # Student returns the book tampered,
     # Since the book was previously tampered,
     # He will not be asked to pay fine
-    student_returning(session_factory(), [22], tampered=True)
+    student_returning([22], tampered=True)
 
     # Student is issued the same book
-    student_issue(session_factory(), 1, 3, [22])
+    student_issue(1, 3, [22])
 
     # Student lost the book bar_code = 22
     # He will be asked to pay fine and
     # The status will be changed to lost
-    student_returning(session_factory(), [22], lost=True)
+    student_returning([22], lost=True)
 
     # When the lost book is tried to be issued to a student
     # It raises an error that the book is lost
-    student_issue(session_factory(), 1, 3, [22])
+    student_issue(1, 3, [22])
 
 
-def impact_analysis(session_factory):
+def impact_analysis():
     """
     Function to see the impact of new curriculum
-
-    Parameters
-    ----------
-    session_factory: Session
-            The session maker factory used to create new session for every request
 
     Returns
     -------
@@ -577,20 +514,20 @@ def impact_analysis(session_factory):
     # Issuing some book to students who are
     # from the same department as the book and also from different department
     # Here a Computer science book is being issued to students
-    student_issue(session_factory(), 1, 2, [24])
-    student_issue(session_factory(), 1, 3, [26])
-    student_issue(session_factory(), 1, 13, [28])
-    student_returning(session_factory(), [28])
-    student_issue(session_factory(), 1, 28, [29])
+    student_issue(1, 2, [24])
+    student_issue(1, 3, [26])
+    student_issue(1, 13, [28])
+    student_returning([28])
+    student_issue(1, 28, [29])
 
     print("\nAnalysing--------------------\n")
     # Calling the impact function to see the impact
     # On computer science department [id=2]
-    impact(session_factory(), 2)
+    impact(2)
 
     print("\nChecking status of book -----------------------\n")
     # Checking the status of book of ISBN-15
-    check_status(session_factory(), 15)
+    check_status(15)
 
 
 def main():
@@ -598,25 +535,21 @@ def main():
     Main function to call the required functions and do some testing
     """
 
-    url = "mysql+pymysql://root:nebula@localhost/library1?charset=utf8mb4"
-    engine = create_engine(url)
-
-    # Base.metadata.create_all(engine)
-
-    Session = sessionmaker(bind=engine)
-
     # Configuring the query log
     config_log_query()
 
+    # Configuring the session factory
+    config_session()
+
     # Calling the basic transaction to do some issues
-    basic_trans(Session)
+    basic_trans()
 
     # calling test tamper function check the security activities
-    test_tamper(Session)
+    test_tamper()
 
     # Calling impact analysis to issue to books and check the impact
     # On Computer science department
-    impact_analysis(Session)
+    impact_analysis()
 
     # Deleting all tables
     Base.metadata.drop_all(engine)
