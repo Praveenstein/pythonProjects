@@ -332,7 +332,7 @@ def professor_returning(b_id, lost=False, tampered=False):
             print("Books are returned")
 
 
-def impact( dep):
+def impact(dep):
     """
     Function to check the impact on a department.
 
@@ -352,29 +352,26 @@ def impact( dep):
             # If department is not in database, raise attribute error
             raise AttributeError("Department not in DB")
 
-        # Finding transactions in which the book of given department occurRed, using join
-        query = session.query(Books.isbn_id, Books.name,
-                              Department.name, BookItem.bar_code,
-                              StudentBorrow.student_trans_id)
-        query = query.join(Department).join(BookItem).join(StudentBorrow)
-        results = query.filter(Department.dept_id == dep).all()
+        # Getting list of students and their transactions who are from different
+        # department but borrowed book from the given department
+        query = session.query(StudentActivity.trans_id,
+                              Books.name,
+                              Students.name,
+                              Department.name)
+        query = query.join(StudentBorrow, StudentActivity.trans_id == StudentBorrow.student_trans_id)
+        query = query.join(BookItem, StudentBorrow.book_bar_code_id == BookItem.bar_code)
+        query = query.join(Books, BookItem.isbn_id == Books.isbn_id)
+        query = query.join(Students, StudentActivity.student_id == Students.reg_id)
+        query = query.join(Department, Students.dept_id == Department.dept_id)
+        query = query.filter(Books.dept_id == dep).filter(Students.dept_id != dep)
+        results = query.all()
         if not results:
             # If no activity was found, it raise an attribute error
             raise AttributeError("No Activity For this Department's Books")
 
-        data = []
-        for result in results:
-            trans = session.query(StudentActivity).\
-                filter_by(trans_id=result[-1]).first()
-            if trans.student.department.dept_id != dep:
-                # Looping through the results and getting details
-                # Of those students who are not from the given department
-                data.append((trans.trans_id, trans.student.name,
-                             trans.student.department.name))
-
-        for i in data:
-            print(f"Transaction Id: {i[0]}, Student name: {i[1]},"
-                  f" student department: {i[2]}")
+        for row in results:
+            print(f"Transaction Id: {row[0]}\tBook Name:{row[1]}\tStudent name: {row[2]},"
+                  f"\tstudent department: {row[3]}")
 
 
 def check_status(book_id):
