@@ -45,13 +45,15 @@ from library.orm.models import Staffs, Department, \
 
 __author__ = 'praveen@gyandata.com'
 
-
-with open('D:\\Profession\\Intern\\Assignments\\master_repo\\'
-          'pythonProjects\\configs\\analyse_log.json', 'r') as file:
-    config = json.load(file)
-
-logging.config.dictConfig(config)
 QUERY_LOGGER = logging.getLogger(__name__)
+
+
+def config_log_query():
+    with open('D:\\Profession\\Intern\\Assignments\\master_repo\\'
+              'pythonProjects\\configs\\analyse_log.json', 'r') as file:
+        config = json.load(file)
+
+    logging.config.dictConfig(config)
 
 
 def student_issue(session, staff, s_id, b_id):
@@ -602,6 +604,9 @@ def main():
     # Base.metadata.create_all(engine)
 
     Session = sessionmaker(bind=engine)
+
+    # Configuring the query log
+    config_log_query()
 
     # Calling the basic transaction to do some issues
     basic_trans(Session)
