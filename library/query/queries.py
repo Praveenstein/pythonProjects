@@ -35,26 +35,29 @@ from contextlib import contextmanager
 
 # User Import
 from library.orm.models import Staffs, Department, \
-    Students, Professors, Books, BookItem, MyEnum, StudentActivity, \
+    Students, Professors, Books, BookItem, BookStatus, StudentActivity, \
     ProfessorActivity, StudentBorrow, ProfessorBorrow, Base
-from library.connections.get_connection import Session, config_session, engine
+from library.connections.get_connection import ENGINE, SESSION_FACTORY
 
 
 __author__ = 'praveen@gyandata.com'
 
-with open('D:\\Profession\\Intern\\Assignments\\master_repo\\'
-          'pythonProjects\\configs\\analyse_log.json', 'r') as file:
-    config = json.load(file)
 
-logging.config.dictConfig(config)
+def config_logger():
+    with open('configs\\analyse_log.json', 'r') as file:
+        config = json.load(file)
 
+    logging.config.dictConfig(config)
+
+
+config_logger()
 QUERY_LOGGER = logging.getLogger(__name__)
 
 
 @contextmanager
 def query_session_scope():
     """Provide a transactional scope around a series of operations."""
-    session = Session()
+    session = SESSION_FACTORY()
     try:
         yield session
         session.commit()
@@ -113,11 +116,11 @@ def student_issue(staff, s_id, b_id):
             raise AttributeError("Book item not in DB")
 
         for book_item in book_list:
-            if book_item.status != MyEnum.AVAILABLE:
+            if book_item.status != BookStatus.AVAILABLE:
                 # If book is not available then raise attribute error
                 raise AttributeError("Book item not Available")
             # If all books are available, then their status are changed
-            book_item.status = MyEnum.UNAVAILABLE
+            book_item.status = BookStatus.UNAVAILABLE
 
         # Creating a student activity object to enter transaction details
         student_activity = StudentActivity(doi=date.today(),
@@ -181,11 +184,11 @@ def professor_issue(staff, p_id, b_id):
             raise AttributeError("Book item not in DB")
 
         for book_item in book_list:
-            if book_item.status != MyEnum.AVAILABLE:
+            if book_item.status != BookStatus.AVAILABLE:
                 # If book is not available then raise attribute error
                 raise AttributeError("Book item not Available")
             # If all books are available, then their status are changed
-            book_item.status = MyEnum.UNAVAILABLE
+            book_item.status = BookStatus.UNAVAILABLE
 
         # Creating a professor activity object to enter transaction details
         professor_activity = ProfessorActivity(doi=date.today(),
@@ -247,11 +250,11 @@ def student_returning(b_id, lost=False, tampered=False):
             if lost:
                 # If book is lost then, status is changed to lost and
                 # student has to pay fine
-                book_list[i].status = MyEnum.LOST
+                book_list[i].status = BookStatus.LOST
                 print("\npay Fine\n")
             else:
                 # If book is not lost, then status is changed to available
-                book_list[i].status = MyEnum.AVAILABLE
+                book_list[i].status = BookStatus.AVAILABLE
 
             if tampered:
                 # If book is tampered
@@ -310,10 +313,10 @@ def professor_returning(b_id, lost=False, tampered=False):
             if lost:
                 # If book is lost then, status is changed to lost and
                 # professor has to pay fine
-                book_list[i].status = MyEnum.LOST
+                book_list[i].status = BookStatus.LOST
             else:
                 # If book is not lost, then status is changed to available
-                book_list[i].status = MyEnum.AVAILABLE
+                book_list[i].status = BookStatus.AVAILABLE
 
             if tampered:
                 # If book is tampered
@@ -399,7 +402,7 @@ def check_status(book_id):
         for item in book_items:
             # Setting due date to none
             due_date = None
-            if item.status == MyEnum.UNAVAILABLE:
+            if item.status == BookStatus.UNAVAILABLE:
                 # If status of book is unavailable, getting student borrow object
                 student_borrow = session.query(StudentBorrow).\
                     filter(StudentBorrow.book_item == item). \
@@ -529,12 +532,6 @@ def main():
     Main function to call the required functions and do some testing
     """
 
-    # Configuring the query log
-    #config_log_query()
-
-    # Configuring the session factory
-    config_session()
-
     # Calling the basic transaction to do some issues
     basic_trans()
 
@@ -546,7 +543,7 @@ def main():
     impact_analysis()
 
     # Deleting all tables
-    Base.metadata.drop_all(engine)
+    Base.metadata.drop_all(ENGINE)
 
 
 if __name__ == '__main__':
