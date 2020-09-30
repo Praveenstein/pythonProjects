@@ -1,26 +1,31 @@
 # -*- coding: utf-8 -*-
-""" Main module for creating engines and session factory
+""" Module for creating Engine and session maker factory
 
 This script requires that the following packages be installed within the Python
 environment you are running this script in.
 
     * sqlalchemy - Package used to connect to a database and do SQL operations using orm_queries
+    * json - Package used to parse json files
 """
 
-# External import
-from sqlalchemy import create_engine
+# Standard Imports
+import json
+
+# External Imports
+from sqlalchemy import engine_from_config
 from sqlalchemy.orm import sessionmaker
 
-url = "mysql+pymysql://root:nebula@localhost/library1?charset=utf8mb4"
-engine = create_engine(url)
 
-# Creating a session factory
-Session = sessionmaker()
-
-
-def config_session():
+def create_engine():
     """
-    This function is used to configure the session factory to connect to the engine
-    :return:
+    Function used to read the configuration file and create engine
+    :return: engine
     """
-    Session.configure(bind=engine)
+    with open("configs\\engine_config.json") as file:
+        data = json.load(file)
+    engine = engine_from_config(data)
+    return engine
+
+
+ENGINE = create_engine()
+SESSION_FACTORY = sessionmaker(bind=ENGINE)
