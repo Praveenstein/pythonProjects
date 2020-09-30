@@ -85,7 +85,6 @@ class Department(TimestampMixin, Base):
     """
 
     __tablename__ = 'department'
-    __table_args__ = {'mysql_engine': 'InnoDB'}
     dept_id = Column(Integer(), primary_key=True)
     name = Column(String(255), index=True, nullable=False)
 
@@ -121,7 +120,6 @@ class Students(TimestampMixin, Base):
 
     """
     __tablename__ = 'students'
-    __table_args__ = {'mysql_engine': 'InnoDB'}
     reg_id = Column(Integer(), primary_key=True)
     name = Column(String(255), index=True, nullable=False)
     doj = Column(DATE(), nullable=False)
@@ -152,7 +150,6 @@ class Professors(TimestampMixin, Base):
 
     """
     __tablename__ = 'professors'
-    __table_args__ = {'mysql_engine': 'InnoDB'}
     employee_code = Column(Integer(), primary_key=True)
     name = Column(String(255), index=True)
     dept_id = Column(Integer(), ForeignKey('department.dept_id'), nullable=False)
@@ -175,7 +172,6 @@ class Authors(TimestampMixin, Base):
 
     """
     __tablename__ = 'authors'
-    __table_args__ = {'mysql_engine': 'InnoDB'}
     author_id = Column(Integer(), primary_key=True)
     name = Column(String(255), index=True, nullable=False)
 
@@ -205,7 +201,6 @@ class Books(TimestampMixin, Base):
 
     """
     __tablename__ = 'books'
-    __table_args__ = {'mysql_engine': 'InnoDB'}
     isbn_id = Column(Integer(), primary_key=True)
     name = Column(String(255), index=True, nullable=False)
     quantity = Column(Integer(), nullable=False)
@@ -237,7 +232,6 @@ class BooksAuthor(TimestampMixin, Base):
 
     """
     __tablename__ = 'book_has_authors'
-    __table_args__ = {'mysql_engine': 'InnoDB'}
     isbn_id = Column(Integer, ForeignKey("books.isbn_id"), primary_key=True)
     author_id = Column(Integer, ForeignKey("authors.author_id"), primary_key=True)
 
@@ -266,7 +260,6 @@ class Staffs(TimestampMixin, Base):
 
     """
     __tablename__ = 'staffs'
-    __table_args__ = {'mysql_engine': 'InnoDB'}
     staff_id = Column(Integer(), primary_key=True)
     name = Column(String(255), index=True, nullable=False)
 
@@ -310,7 +303,6 @@ class BookItem(TimestampMixin, Base):
     """
 
     __tablename__ = 'book_item'
-    __table_args__ = {'mysql_engine': 'InnoDB'}
 
     bar_code = Column(Integer(), primary_key=True)
     # Date of Purchase
@@ -343,7 +335,6 @@ class StudentActivity(TimestampMixin, Base):
 
     """
     __tablename__ = 'student_activity'
-    __table_args__ = {'mysql_engine': 'InnoDB'}
     trans_id = Column(Integer(), primary_key=True)
     # Date of issue
     doi = Column(DATE(), nullable=False)
@@ -372,7 +363,6 @@ class ProfessorActivity(TimestampMixin, Base):
 
     """
     __tablename__ = 'professor_activity'
-    __table_args__ = {'mysql_engine': 'InnoDB'}
     trans_id = Column(Integer(), primary_key=True)
     # Date of issue
     doi = Column(DATE(), nullable=False)
@@ -408,7 +398,6 @@ class StudentBorrow(TimestampMixin, Base):
 
     """
     __tablename__ = 'student_borrow'
-    __table_args__ = {'mysql_engine': 'InnoDB'}
     student_trans_id = Column(Integer, ForeignKey("student_activity.trans_id"), primary_key=True)
     book_bar_code_id = Column(Integer, ForeignKey("book_item.bar_code"), primary_key=True)
     due_date = Column(DATE(), nullable=False, default=date.today() + timedelta(15))
@@ -448,7 +437,6 @@ class ProfessorBorrow(TimestampMixin, Base):
     """
 
     __tablename__ = 'professor_borrow'
-    __table_args__ = {'mysql_engine': 'InnoDB'}
     professor_trans_id = Column(Integer, ForeignKey("professor_activity.trans_id"),
                                 primary_key=True)
     book_bar_code_id = Column(Integer, ForeignKey("book_item.bar_code"),
