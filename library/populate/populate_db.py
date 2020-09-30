@@ -19,32 +19,33 @@ import random
 from datetime import date, timedelta
 from contextlib import contextmanager
 import json
-import logging
 import logging.config
 
 # User Import
 from library.orm.models import Staffs, Department, \
     Students, Professors, Books, BookItem,\
     Base, Authors
-from library.connections.get_connection import Session, config_session, engine
+from library.connections.get_connection import ENGINE, SESSION_FACTORY
 
 
 __author__ = 'praveen@gyandata.com'
 
 
-with open('D:\\Profession\\Intern\\Assignments\\master_repo\\'
-          'pythonProjects\\configs\\pop_log.json', 'r') as file:
-    config = json.load(file)
+def config_logger():
+    with open('configs\\pop_log.json', 'r') as file:
+        config = json.load(file)
 
-logging.config.dictConfig(config)
+    logging.config.dictConfig(config)
 
+
+config_logger()
 POP_LOGGER = logging.getLogger(__name__)
 
 
 @contextmanager
 def population_session_scope():
     """Provide a transactional scope around a series of operations."""
-    session = Session()
+    session = SESSION_FACTORY()
     try:
         yield session
         session.commit()
@@ -124,13 +125,7 @@ def main():
     """ The main function to initialize engines and call necessary functions"""
 
     # Creating all tables in the database
-    Base.metadata.create_all(engine)
-
-    # Configure the logger
-    #config_log_pop()
-
-    # Configure the session
-    config_session()
+    Base.metadata.create_all(ENGINE)
 
     # calling populate function to populate the database
     populate()
