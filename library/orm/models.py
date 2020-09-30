@@ -25,21 +25,24 @@ environment you are running this script in.
 """
 
 # Standard Imports
-from datetime import date, timedelta, datetime
+from datetime import date, timedelta
 import enum
 
 # External Imports
-from sqlalchemy import Column, Integer, DateTime, Enum, \
+from sqlalchemy import Column, Integer, Enum, \
     String, Float, DATE, Boolean, ForeignKey, CheckConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
+from sqlalchemy import TIMESTAMP
+from sqlalchemy import text
+from sqlalchemy.schema import FetchedValue
 
 __author__ = 'praveen@gyandata.com'
 
 Base = declarative_base()
 
 
-class MyEnum(enum.Enum):
+class BookStatus(enum.Enum):
     """ Enum class to store the status of book items"""
     AVAILABLE = "AVAILABLE"
     UNAVAILABLE = "UNAVAILABLE"
@@ -70,11 +73,17 @@ class Department(Base):
     """
 
     __tablename__ = 'department'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
     dept_id = Column(Integer(), primary_key=True)
     name = Column(String(255), index=True, nullable=False)
 
-    created_on = Column(DateTime, default=datetime.now())
-    update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    created_on = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP"))
+    last_updated = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_onupdate=FetchedValue())
 
     students = relationship("Students", backref=backref('department'), order_by="Students.reg_id",
                             cascade="all, delete, delete-orphan")
@@ -108,13 +117,19 @@ class Students(Base):
 
     """
     __tablename__ = 'students'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
     reg_id = Column(Integer(), primary_key=True)
     name = Column(String(255), index=True, nullable=False)
     doj = Column(DATE(), nullable=False)
     dept_id = Column(Integer(), ForeignKey('department.dept_id'), nullable=False)
 
-    created_on = Column(DateTime, default=datetime.now())
-    update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    created_on = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP"))
+    last_updated = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_onupdate=FetchedValue())
 
     activities = relationship("StudentActivity", backref=backref('student'),
                               order_by="StudentActivity.trans_id",
@@ -141,12 +156,18 @@ class Professors(Base):
 
     """
     __tablename__ = 'professors'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
     employee_code = Column(Integer(), primary_key=True)
     name = Column(String(255), index=True)
     dept_id = Column(Integer(), ForeignKey('department.dept_id'), nullable=False)
 
-    created_on = Column(DateTime, default=datetime.now())
-    update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    created_on = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP"))
+    last_updated = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_onupdate=FetchedValue())
 
     activities = relationship("ProfessorActivity", backref=backref('professor'),
                               order_by="ProfessorActivity.trans_id",
@@ -166,11 +187,17 @@ class Authors(Base):
 
     """
     __tablename__ = 'authors'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
     author_id = Column(Integer(), primary_key=True)
     name = Column(String(255), index=True, nullable=False)
 
-    created_on = Column(DateTime, default=datetime.now())
-    update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    created_on = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP"))
+    last_updated = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_onupdate=FetchedValue())
 
     books = relationship("Books", backref="authors", secondary="book_has_authors")
 
@@ -198,13 +225,19 @@ class Books(Base):
 
     """
     __tablename__ = 'books'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
     isbn_id = Column(Integer(), primary_key=True)
     name = Column(String(255), index=True, nullable=False)
     quantity = Column(Integer(), nullable=False)
     dept_id = Column(Integer(), ForeignKey('department.dept_id'), nullable=False)
 
-    created_on = Column(DateTime, default=datetime.now())
-    update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    created_on = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP"))
+    last_updated = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_onupdate=FetchedValue())
 
     book_items = relationship("BookItem", backref=backref('book'),
                               order_by="BookItem.bar_code",
@@ -232,11 +265,17 @@ class BooksAuthor(Base):
 
     """
     __tablename__ = 'book_has_authors'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
     isbn_id = Column(Integer, ForeignKey("books.isbn_id"), primary_key=True)
     author_id = Column(Integer, ForeignKey("authors.author_id"), primary_key=True)
 
-    created_on = Column(DateTime, default=datetime.now())
-    update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    created_on = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP"))
+    last_updated = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_onupdate=FetchedValue())
 
     book = relationship("Books", backref=backref("author_associations",
                                                  cascade="all, delete, delete-orphan"))
@@ -263,11 +302,17 @@ class Staffs(Base):
 
     """
     __tablename__ = 'staffs'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
     staff_id = Column(Integer(), primary_key=True)
     name = Column(String(255), index=True, nullable=False)
 
-    created_on = Column(DateTime, default=datetime.now())
-    update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    created_on = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP"))
+    last_updated = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_onupdate=FetchedValue())
 
     student_activities = relationship("StudentActivity", backref=backref('staff'),
                                       order_by="StudentActivity.trans_id",
@@ -309,21 +354,26 @@ class BookItem(Base):
     """
 
     __tablename__ = 'book_item'
-    __table_args__ = (CheckConstraint('price >= 0.00', name='unit_cost_positive'),)
+    __table_args__ = {'mysql_engine': 'InnoDB'}
 
     bar_code = Column(Integer(), primary_key=True)
     # Date of Purchase
     dopur = Column(DATE(), nullable=False)
     # Date of Publication
     dopub = Column(DATE(), nullable=False)
-    price = Column(Float(2), nullable=False)
+    price = Column(Float(2), CheckConstraint('price >= 0.00'), nullable=False)
     edition = Column(Float(2))
-    status = Column(Enum(MyEnum), default=MyEnum.AVAILABLE, nullable=False)
+    status = Column(Enum(BookStatus), default=BookStatus.AVAILABLE, nullable=False)
     tampered = Column(Boolean(), default=False)
     isbn_id = Column(Integer(), ForeignKey('books.isbn_id'), nullable=False)
 
-    created_on = Column(DateTime, default=datetime.now())
-    update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    created_on = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP"))
+    last_updated = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_onupdate=FetchedValue())
 
 
 class StudentActivity(Base):
@@ -345,13 +395,20 @@ class StudentActivity(Base):
 
     """
     __tablename__ = 'student_activity'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
     trans_id = Column(Integer(), primary_key=True)
     # Date of issue
     doi = Column(DATE(), nullable=False)
     student_id = Column(Integer(), ForeignKey('students.reg_id'), nullable=False)
     staff_id = Column(Integer(), ForeignKey('staffs.staff_id'), nullable=False)
 
-    update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    created_on = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP"))
+    last_updated = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_onupdate=FetchedValue())
 
     book_items = relationship("BookItem", backref="student_activities", secondary="student_borrow")
 
@@ -375,13 +432,20 @@ class ProfessorActivity(Base):
 
     """
     __tablename__ = 'professor_activity'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
     trans_id = Column(Integer(), primary_key=True)
     # Date of issue
     doi = Column(DATE(), nullable=False)
     professor_id = Column(Integer(), ForeignKey('professors.employee_code'), nullable=False)
     staff_id = Column(Integer(), ForeignKey('staffs.staff_id'), nullable=False)
 
-    update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    created_on = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP"))
+    last_updated = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_onupdate=FetchedValue())
 
     book_items = relationship("BookItem", backref="professor_activities",
                               secondary="professor_borrow")
@@ -412,12 +476,19 @@ class StudentBorrow(Base):
 
     """
     __tablename__ = 'student_borrow'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
     student_trans_id = Column(Integer, ForeignKey("student_activity.trans_id"), primary_key=True)
     book_bar_code_id = Column(Integer, ForeignKey("book_item.bar_code"), primary_key=True)
     due_date = Column(DATE(), nullable=False, default=date.today() + timedelta(15))
     return_date = Column(DATE())
 
-    update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    created_on = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP"))
+    last_updated = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_onupdate=FetchedValue())
 
     student_activity = relationship("StudentActivity",
                                     backref=backref("book_item_associations",
@@ -453,6 +524,7 @@ class ProfessorBorrow(Base):
     """
 
     __tablename__ = 'professor_borrow'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
     professor_trans_id = Column(Integer, ForeignKey("professor_activity.trans_id"),
                                 primary_key=True)
     book_bar_code_id = Column(Integer, ForeignKey("book_item.bar_code"),
@@ -462,7 +534,13 @@ class ProfessorBorrow(Base):
     # Return Date
     return_date = Column(DATE())
 
-    update_on = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    created_on = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP"))
+    last_updated = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_onupdate=FetchedValue())
 
     professor_activity = relationship("ProfessorActivity",
                                       backref=backref("book_item_associations",
