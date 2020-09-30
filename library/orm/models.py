@@ -49,7 +49,19 @@ class BookStatus(enum.Enum):
     LOST = "LOST"
 
 
-class Department(Base):
+class TimestampMixin(object):
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
+    created_on = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP"))
+    last_updated = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_onupdate=FetchedValue())
+
+
+class Department(TimestampMixin, Base):
     """This class stores the information pertaining to the Department Table of the Database.
 
     Attributes
@@ -77,14 +89,6 @@ class Department(Base):
     dept_id = Column(Integer(), primary_key=True)
     name = Column(String(255), index=True, nullable=False)
 
-    created_on = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP"))
-    last_updated = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-        server_onupdate=FetchedValue())
-
     students = relationship("Students", backref=backref('department'), order_by="Students.reg_id",
                             cascade="all, delete, delete-orphan")
     staffs = relationship("Professors", backref=backref('department'),
@@ -94,7 +98,7 @@ class Department(Base):
                          cascade="all, delete, delete-orphan")
 
 
-class Students(Base):
+class Students(TimestampMixin, Base):
     """This class stores the information pertaining to the Students.
 
     Attributes
@@ -123,20 +127,12 @@ class Students(Base):
     doj = Column(DATE(), nullable=False)
     dept_id = Column(Integer(), ForeignKey('department.dept_id'), nullable=False)
 
-    created_on = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP"))
-    last_updated = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-        server_onupdate=FetchedValue())
-
     activities = relationship("StudentActivity", backref=backref('student'),
                               order_by="StudentActivity.trans_id",
                               cascade="all, delete, delete-orphan")
 
 
-class Professors(Base):
+class Professors(TimestampMixin, Base):
     """This class stores the information pertaining to the Professors.
 
     Attributes
@@ -161,20 +157,12 @@ class Professors(Base):
     name = Column(String(255), index=True)
     dept_id = Column(Integer(), ForeignKey('department.dept_id'), nullable=False)
 
-    created_on = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP"))
-    last_updated = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-        server_onupdate=FetchedValue())
-
     activities = relationship("ProfessorActivity", backref=backref('professor'),
                               order_by="ProfessorActivity.trans_id",
                               cascade="all, delete, delete-orphan")
 
 
-class Authors(Base):
+class Authors(TimestampMixin, Base):
     """This class stores the information pertaining to the authors.
 
     Attributes
@@ -191,18 +179,10 @@ class Authors(Base):
     author_id = Column(Integer(), primary_key=True)
     name = Column(String(255), index=True, nullable=False)
 
-    created_on = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP"))
-    last_updated = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-        server_onupdate=FetchedValue())
-
     books = relationship("Books", backref="authors", secondary="book_has_authors")
 
 
-class Books(Base):
+class Books(TimestampMixin, Base):
     """This class stores the information pertaining to the books.
 
     Attributes
@@ -231,20 +211,12 @@ class Books(Base):
     quantity = Column(Integer(), nullable=False)
     dept_id = Column(Integer(), ForeignKey('department.dept_id'), nullable=False)
 
-    created_on = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP"))
-    last_updated = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-        server_onupdate=FetchedValue())
-
     book_items = relationship("BookItem", backref=backref('book'),
                               order_by="BookItem.bar_code",
                               cascade="all, delete, delete-orphan")
 
 
-class BooksAuthor(Base):
+class BooksAuthor(TimestampMixin, Base):
     """This class stores the information pertaining to the BookAuthors-
     An Association table to reflect the many to many relationship between
     books and authors.
@@ -269,21 +241,13 @@ class BooksAuthor(Base):
     isbn_id = Column(Integer, ForeignKey("books.isbn_id"), primary_key=True)
     author_id = Column(Integer, ForeignKey("authors.author_id"), primary_key=True)
 
-    created_on = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP"))
-    last_updated = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-        server_onupdate=FetchedValue())
-
     book = relationship("Books", backref=backref("author_associations",
                                                  cascade="all, delete, delete-orphan"))
     author = relationship("Authors", backref=backref("books_associations",
                                                      cascade="all, delete, delete-orphan"))
 
 
-class Staffs(Base):
+class Staffs(TimestampMixin, Base):
     """This class stores the information pertaining to the staffs.
 
     Attributes
@@ -306,14 +270,6 @@ class Staffs(Base):
     staff_id = Column(Integer(), primary_key=True)
     name = Column(String(255), index=True, nullable=False)
 
-    created_on = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP"))
-    last_updated = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-        server_onupdate=FetchedValue())
-
     student_activities = relationship("StudentActivity", backref=backref('staff'),
                                       order_by="StudentActivity.trans_id",
                                       cascade="all, delete, delete-orphan")
@@ -322,7 +278,7 @@ class Staffs(Base):
                                         cascade="all, delete, delete-orphan")
 
 
-class BookItem(Base):
+class BookItem(TimestampMixin, Base):
     """This class stores the information pertaining to the book items.
 
     Attributes
@@ -367,16 +323,8 @@ class BookItem(Base):
     tampered = Column(Boolean(), default=False)
     isbn_id = Column(Integer(), ForeignKey('books.isbn_id'), nullable=False)
 
-    created_on = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP"))
-    last_updated = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-        server_onupdate=FetchedValue())
 
-
-class StudentActivity(Base):
+class StudentActivity(TimestampMixin, Base):
     """This class stores the information pertaining to the StudentActivity.
 
     Attributes
@@ -402,18 +350,10 @@ class StudentActivity(Base):
     student_id = Column(Integer(), ForeignKey('students.reg_id'), nullable=False)
     staff_id = Column(Integer(), ForeignKey('staffs.staff_id'), nullable=False)
 
-    created_on = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP"))
-    last_updated = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-        server_onupdate=FetchedValue())
-
     book_items = relationship("BookItem", backref="student_activities", secondary="student_borrow")
 
 
-class ProfessorActivity(Base):
+class ProfessorActivity(TimestampMixin, Base):
     """This class stores the information pertaining to the ProfessorActivity.
 
     Attributes
@@ -439,19 +379,11 @@ class ProfessorActivity(Base):
     professor_id = Column(Integer(), ForeignKey('professors.employee_code'), nullable=False)
     staff_id = Column(Integer(), ForeignKey('staffs.staff_id'), nullable=False)
 
-    created_on = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP"))
-    last_updated = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-        server_onupdate=FetchedValue())
-
     book_items = relationship("BookItem", backref="professor_activities",
                               secondary="professor_borrow")
 
 
-class StudentBorrow(Base):
+class StudentBorrow(TimestampMixin, Base):
     """This class stores the information pertaining to the StudentBorrow, which reflects the many
     to many relationship between student's transaction and book-items.
 
@@ -482,14 +414,6 @@ class StudentBorrow(Base):
     due_date = Column(DATE(), nullable=False, default=date.today() + timedelta(15))
     return_date = Column(DATE())
 
-    created_on = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP"))
-    last_updated = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-        server_onupdate=FetchedValue())
-
     student_activity = relationship("StudentActivity",
                                     backref=backref("book_item_associations",
                                                     cascade="all, delete, delete-orphan"))
@@ -497,7 +421,7 @@ class StudentBorrow(Base):
                                                          cascade="all, delete, delete-orphan"))
 
 
-class ProfessorBorrow(Base):
+class ProfessorBorrow(TimestampMixin, Base):
     """This class stores the information pertaining to the ProfessorBorrow, which reflects the many
     to many relationship between professor's transaction and book-items.
 
@@ -533,14 +457,6 @@ class ProfessorBorrow(Base):
     due_date = Column(DATE(), nullable=False, default=date.today() + timedelta(15))
     # Return Date
     return_date = Column(DATE())
-
-    created_on = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP"))
-    last_updated = Column(
-        TIMESTAMP,
-        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-        server_onupdate=FetchedValue())
 
     professor_activity = relationship("ProfessorActivity",
                                       backref=backref("book_item_associations",
