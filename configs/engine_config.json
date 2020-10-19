@@ -1,6 +1,6 @@
 {
   "sqlalchemy.url": "mysql+pymysql://root:nebula@localhost/library1?charset=utf8mb4",
-  "sqlalchemy.echo": "True",
+  "sqlalchemy.echo": "False",
   "sqlalchemy.echo_pool": "True",
   "sqlalchemy.max_overflow": 10,
   "sqlalchemy.pool_size": 5

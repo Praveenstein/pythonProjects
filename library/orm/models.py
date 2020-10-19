@@ -39,7 +39,7 @@ from sqlalchemy.schema import FetchedValue
 
 __author__ = 'praveen@gyandata.com'
 
-Base = declarative_base()
+BASE = declarative_base()
 
 
 class BookStatus(enum.Enum):
@@ -49,7 +49,11 @@ class BookStatus(enum.Enum):
     LOST = "LOST"
 
 
-class TimestampMixin(object):
+class TimestampMixin:
+    """
+    Class to be inherited by other classes to get user trail attributes
+    such as created_on and last_updated_on
+    """
     __table_args__ = {'mysql_engine': 'InnoDB'}
 
     created_on = Column(
@@ -61,7 +65,7 @@ class TimestampMixin(object):
         server_onupdate=FetchedValue())
 
 
-class Department(TimestampMixin, Base):
+class Department(TimestampMixin, BASE):
     """This class stores the information pertaining to the Department Table of the Database.
 
     Attributes
@@ -97,7 +101,7 @@ class Department(TimestampMixin, Base):
                          cascade="all, delete, delete-orphan")
 
 
-class Students(TimestampMixin, Base):
+class Students(TimestampMixin, BASE):
     """This class stores the information pertaining to the Students.
 
     Attributes
@@ -130,7 +134,7 @@ class Students(TimestampMixin, Base):
                               cascade="all, delete, delete-orphan")
 
 
-class Professors(TimestampMixin, Base):
+class Professors(TimestampMixin, BASE):
     """This class stores the information pertaining to the Professors.
 
     Attributes
@@ -159,7 +163,7 @@ class Professors(TimestampMixin, Base):
                               cascade="all, delete, delete-orphan")
 
 
-class Authors(TimestampMixin, Base):
+class Authors(TimestampMixin, BASE):
     """This class stores the information pertaining to the authors.
 
     Attributes
@@ -178,7 +182,7 @@ class Authors(TimestampMixin, Base):
     books = relationship("Books", backref="authors", secondary="book_has_authors")
 
 
-class Books(TimestampMixin, Base):
+class Books(TimestampMixin, BASE):
     """This class stores the information pertaining to the books.
 
     Attributes
@@ -211,7 +215,7 @@ class Books(TimestampMixin, Base):
                               cascade="all, delete, delete-orphan")
 
 
-class BooksAuthor(TimestampMixin, Base):
+class BooksAuthor(TimestampMixin, BASE):
     """This class stores the information pertaining to the BookAuthors-
     An Association table to reflect the many to many relationship between
     books and authors.
@@ -241,7 +245,7 @@ class BooksAuthor(TimestampMixin, Base):
                                                      cascade="all, delete, delete-orphan"))
 
 
-class Staffs(TimestampMixin, Base):
+class Staffs(TimestampMixin, BASE):
     """This class stores the information pertaining to the staffs.
 
     Attributes
@@ -271,7 +275,7 @@ class Staffs(TimestampMixin, Base):
                                         cascade="all, delete, delete-orphan")
 
 
-class BookItem(TimestampMixin, Base):
+class BookItem(TimestampMixin, BASE):
     """This class stores the information pertaining to the book items.
 
     Attributes
@@ -316,7 +320,7 @@ class BookItem(TimestampMixin, Base):
     isbn_id = Column(Integer(), ForeignKey('books.isbn_id'), nullable=False)
 
 
-class StudentActivity(TimestampMixin, Base):
+class StudentActivity(TimestampMixin, BASE):
     """This class stores the information pertaining to the StudentActivity.
 
     Attributes
@@ -344,7 +348,7 @@ class StudentActivity(TimestampMixin, Base):
     book_items = relationship("BookItem", backref="student_activities", secondary="student_borrow")
 
 
-class ProfessorActivity(TimestampMixin, Base):
+class ProfessorActivity(TimestampMixin, BASE):
     """This class stores the information pertaining to the ProfessorActivity.
 
     Attributes
@@ -373,7 +377,7 @@ class ProfessorActivity(TimestampMixin, Base):
                               secondary="professor_borrow")
 
 
-class StudentBorrow(TimestampMixin, Base):
+class StudentBorrow(TimestampMixin, BASE):
     """This class stores the information pertaining to the StudentBorrow, which reflects the many
     to many relationship between student's transaction and book-items.
 
@@ -410,7 +414,7 @@ class StudentBorrow(TimestampMixin, Base):
                                                          cascade="all, delete, delete-orphan"))
 
 
-class ProfessorBorrow(TimestampMixin, Base):
+class ProfessorBorrow(TimestampMixin, BASE):
     """This class stores the information pertaining to the ProfessorBorrow, which reflects the many
     to many relationship between professor's transaction and book-items.
 

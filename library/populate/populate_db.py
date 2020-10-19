@@ -18,28 +18,19 @@ environment you are running this script in.
 import random
 from datetime import date, timedelta
 from contextlib import contextmanager
-import json
-import logging.config
+import logging
 
 # User Import
 from library.orm.models import Staffs, Department, \
     Students, Professors, Books, BookItem,\
-    Base, Authors
+    BASE, Authors
 from library.connections.get_connection import ENGINE, SESSION_FACTORY
 
 
 __author__ = 'praveen@gyandata.com'
 
 
-def config_logger():
-    with open('configs\\pop_log.json', 'r') as file:
-        config = json.load(file)
-
-    logging.config.dictConfig(config)
-
-
-config_logger()
-POP_LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 @contextmanager
@@ -50,10 +41,10 @@ def population_session_scope():
         yield session
         session.commit()
     except AssertionError as err:
-        POP_LOGGER.error(err)
+        LOGGER.error(err)
     except AttributeError as err:
         session.rollback()
-        POP_LOGGER.error(err)
+        LOGGER.error(err)
     finally:
         session.close()
 
@@ -125,7 +116,7 @@ def main():
     """ The main function to initialize engines and call necessary functions"""
 
     # Creating all tables in the database
-    Base.metadata.create_all(ENGINE)
+    BASE.metadata.create_all(ENGINE)
 
     # calling populate function to populate the database
     populate()

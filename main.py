@@ -7,9 +7,13 @@ environment you are running this script in.
     * sqlalchemy - Package used to connect to a database and do SQL operations using orm_queries
 """
 
+# Standard imports
+import logging.config
+import json
+
 # User Import
 from library.connections.get_connection import ENGINE
-from library.orm.models import Base
+from library.orm.models import BASE
 from library.populate.populate_db import populate
 from library.query.queries import basic_trans, impact_analysis,\
     test_tamper
@@ -18,11 +22,25 @@ from library.query.queries import basic_trans, impact_analysis,\
 __author__ = 'praveen@gyandata.com'
 
 
+def configure_logging():
+    """
+    function to configure logging
+    :return: nothing
+    :rtype: None
+    """
+    with open('configs\\log.json', 'r') as file:
+        config = json.load(file)
+
+    logging.config.dictConfig(config)
+
+
 def main():
     """Main Function to populate the database and perform queries"""
 
+    configure_logging()
+
     # Creating all the tables
-    Base.metadata.create_all(ENGINE)
+    BASE.metadata.create_all(ENGINE)
 
     # Populating the database, # Giving a new session as parameter
     populate()
@@ -41,7 +59,7 @@ def main():
     impact_analysis()
 
     # Deleting all tables
-    Base.metadata.drop_all(ENGINE)
+    BASE.metadata.drop_all(ENGINE)
 
 
 if __name__ == '__main__':

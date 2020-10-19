@@ -29,29 +29,19 @@ environment you are running this script in.
 
 # Standard import
 from datetime import date
-import json
-import logging.config
+import logging
 from contextlib import contextmanager
 
 # User Import
 from library.orm.models import Staffs, Department, \
     Students, Professors, Books, BookItem, BookStatus, StudentActivity, \
-    ProfessorActivity, StudentBorrow, ProfessorBorrow, Base
+    ProfessorActivity, StudentBorrow, ProfessorBorrow, BASE
 from library.connections.get_connection import ENGINE, SESSION_FACTORY
 
 
 __author__ = 'praveen@gyandata.com'
 
-
-def config_logger():
-    with open('configs\\analyse_log.json', 'r') as file:
-        config = json.load(file)
-
-    logging.config.dictConfig(config)
-
-
-config_logger()
-QUERY_LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 @contextmanager
@@ -62,10 +52,10 @@ def query_session_scope():
         yield session
         session.commit()
     except AssertionError as err:
-        QUERY_LOGGER.error(err)
+        LOGGER.error(err)
     except AttributeError as err:
         session.rollback()
-        QUERY_LOGGER.error(err)
+        LOGGER.error(err)
     finally:
         session.close()
 
@@ -89,7 +79,7 @@ def student_issue(staff, s_id, b_id):
 
     with query_session_scope() as session:
         # Asserting the parameters
-        assert isinstance(staff, int), "Staff ID should be integer"
+        assert issubclass(type(staff), int), "Staff ID should be integer"
         assert isinstance(s_id, int), "Student ID should be integer"
         assert isinstance(b_id, list), "Books should be a list"
 
@@ -543,7 +533,7 @@ def main():
     impact_analysis()
 
     # Deleting all tables
-    Base.metadata.drop_all(ENGINE)
+    BASE.metadata.drop_all(ENGINE)
 
 
 if __name__ == '__main__':
